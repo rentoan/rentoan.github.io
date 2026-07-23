@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Đăng nhập Góc luyện Toán THCS.">
+  <title>Đăng nhập | Rèn Toán</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-brand-panel">
+      <a class="logo login-logo" href="login.html"><span class="logo-mark">∑</span><span>Rèn <b>Toán</b></span></a>
+      <p class="kicker">GÓC LUYỆN TOÁN THCS</p>
+      <h1>Mỗi ngày một ít,<br><span>kiến thức bén rễ.</span></h1>
+      <p>Đăng nhập bằng tài khoản được cấp để học đúng lớp và lưu tiến độ trên mọi thiết bị.</p>
+      <div class="login-benefits"><span>✓ Bài tập sinh tự động</span><span>✓ Phản hồi ngay</span><span>✓ Lưu số câu đã làm và làm đúng</span></div>
+    </section>
+
+    <section class="login-card" aria-labelledby="loginTitle">
+      <p class="kicker">CHÀO MỪNG TRỞ LẠI</p>
+      <h2 id="loginTitle">Đăng nhập học tập</h2>
+      <p class="login-help">Nhập tên người dùng và mật khẩu giáo viên đã cấp.</p>
+      <form id="loginForm" novalidate>
+        <label class="form-field"><span>Tên đăng nhập</span><input id="username" name="username" autocomplete="username" placeholder="Ví dụ: user01" required></label>
+        <label class="form-field"><span>Mật khẩu</span><div class="password-wrap"><input id="password" name="password" type="password" autocomplete="current-password" required><button id="togglePassword" type="button" aria-label="Hiện mật khẩu">Hiện</button></div></label>
+        <button id="loginButton" class="primary-login-button" type="submit">Đăng nhập</button>
+        <p id="loginMessage" class="login-message" aria-live="polite"></p>
+      </form>
+      <p class="login-note">Bạn không tự đăng ký tài khoản. Khi cần cấp lại mật khẩu, hãy liên hệ người quản lý lớp học.</p>
+    </section>
+  </main>
+  <script type="module" src="assets/login.js"></script>
+</body>
+</html>
