@@ -1,0 +1,8 @@
+{
+  "username": "user01",
+  "displayName": "Nguyễn Minh An",
+  "role": "student",
+  "active": true,
+  "allowedGrades": [8],
+  "allowedTopics": ["lop8-chude1"]
+}
