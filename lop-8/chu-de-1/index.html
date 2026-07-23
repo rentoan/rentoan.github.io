@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi" class="auth-pending">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Luyện tập Toán 8 theo chủ đề - Biến đổi biểu thức đại số" />
+  <title>Toán 8 theo chủ đề</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html">Toán 8 <span>theo chủ đề</span></a>
+      <div id="accountBox" class="account-box" data-progress-href="../../tien-do.html" data-login-href="../../login.html"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav style="padding-top:22px;font-size:.9rem;color:var(--muted)"><a href="../../index.html" style="color:inherit;text-decoration:none">Trang chủ</a> / <a href="../index.html" style="color:inherit;text-decoration:none">Toán 8</a> / Chủ đề 1</nav>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">KẾT NỐI TRI THỨC VỚI CUỘC SỐNG</p>
+        <h1>Chủ đề 1: Biến đổi biểu thức đại số</h1>
+        <p class="hero-text">Luyện từng thao tác nhỏ cho đến khi việc thu gọn biểu thức trở thành phản xạ tự nhiên.</p>
+      </div>
+      <div class="progress-card">
+        <span>Kết quả phiên học</span>
+        <strong id="sessionScore">0 đúng / 0 câu</strong>
+        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+      </div>
+    </section>
+
+    <section class="daily-summary" aria-label="Tiến độ học tập">
+      <div class="summary-heading">
+        <div>
+          <p class="eyebrow">TIẾN ĐỘ HỌC TẬP</p>
+          <h2>Kết quả hôm nay</h2>
+        </div>
+        <span id="todayLabel" class="date-chip"></span>
+      </div>
+      <div class="summary-grid">
+        <article class="summary-item"><span>Đã làm</span><strong id="todayAnswered">0</strong><small>câu</small></article>
+        <article class="summary-item"><span>Làm đúng</span><strong id="todayCorrect">0</strong><small>câu</small></article>
+        <article class="summary-item"><span>Chính xác</span><strong id="todayAccuracy">0%</strong><small>trong hôm nay</small></article>
+        <article class="summary-item"><span>Tổng quá trình</span><strong id="allTimeAnswered">0</strong><small>câu đã làm</small></article>
+      </div>
+      <p class="storage-note">Kết quả được đồng bộ theo tài khoản người học.</p>
+    </section>
+
+    <section class="layout">
+      <aside class="level-panel" aria-label="Danh sách mức luyện">
+        <h2>Các mức luyện</h2>
+        <div id="levelList" class="level-list"></div>
+      </aside>
+
+      <section class="practice-card">
+        <div class="practice-topline">
+          <div>
+            <span id="levelBadge" class="badge">Mức 1</span>
+            <h2 id="levelTitle">Thu gọn hạng tử đồng dạng</h2>
+          </div>
+          <button id="newQuestionBtn" class="secondary-button">Bài mới</button>
+        </div>
+
+        <div class="instruction" id="instruction">Rút gọn biểu thức sau:</div>
+        <div id="expression" class="expression">3x + 5x</div>
+
+        <div id="answerArea" class="answer-area"></div>
+
+        <div class="actions">
+          <button id="submitBtn" class="primary-button">Nộp bài</button>
+          <button id="showAnswerBtn" class="ghost-button">Xem đáp án</button>
+        </div>
+
+        <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+      </section>
+    </section>
+
+    <section class="tips-card">
+      <h2>Gợi ý học</h2>
+      <p id="levelTip">Chỉ cộng hoặc trừ các hệ số của những hạng tử có cùng phần biến.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container"><a href="../index.html" style="color:inherit">← Danh sách chủ đề Toán 8</a> · Một góc luyện Toán nhỏ, sạch và vừa đủ ✦</div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
