@@ -4,22 +4,36 @@ service cloud.firestore {
     function signedIn() {
       return request.auth != null;
     }
-    function isOwner(userId) {
+    function owner(userId) {
       return signedIn() && request.auth.uid == userId;
+    }
+    function validCounters(data) {
+      return data.attempted is int
+        && data.correct is int
+        && data.attempted >= 0
+        && data.correct >= 0
+        && data.correct <= data.attempted;
+    }
+    function validCreate() {
+      return validCounters(request.resource.data)
+        && request.resource.data.attempted == 1
+        && (request.resource.data.correct == 0 || request.resource.data.correct == 1);
+    }
+    function validUpdate() {
+      return validCounters(request.resource.data)
+        && request.resource.data.attempted == resource.data.attempted + 1
+        && (request.resource.data.correct == resource.data.correct
+          || request.resource.data.correct == resource.data.correct + 1);
     }
 
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if owner(userId);
       allow create, update, delete: if false;
 
       match /progress/{progressId} {
-        allow read: if isOwner(userId);
-        allow create, update: if isOwner(userId)
-          && request.resource.data.attempted is int
-          && request.resource.data.correct is int
-          && request.resource.data.attempted >= 0
-          && request.resource.data.correct >= 0
-          && request.resource.data.correct <= request.resource.data.attempted;
+        allow read: if owner(userId);
+        allow create: if owner(userId) && validCreate();
+        allow update: if owner(userId) && validUpdate();
         allow delete: if false;
       }
     }

@@ -1,25 +1,56 @@
-import { requireAccess, renderAccount } from "./auth-service.js";
-import { loadAllProgress } from "./progress-service.js";
+import { requireLogin, mountAccount, displayName } from "../core/auth.js";
+import { loadTopic, percent, masteryLabel } from "../core/progress.js";
 
-const topics = [{ id: "lop8-chude1", title: "Toán 8 · Biến đổi biểu thức đại số", href: "lop-8/chu-de-1/index.html" }];
-const session = await requireAccess({ loginPath: "login.html", deniedPath: "khong-co-quyen.html" });
-if (session) {
-  renderAccount(session, document.getElementById("accountBox"));
-  document.getElementById("welcomeText").textContent = `${session.profile.displayName || session.profile.username}, đây là kết quả được đồng bộ theo tài khoản của bạn.`;
-  try {
-    const data = await loadAllProgress(topics.map(t => t.id));
-    const attempted = data.today.attempted || 0;
-    const correct = data.today.correct || 0;
-    document.getElementById("pTodayAttempted").textContent = attempted;
-    document.getElementById("pTodayCorrect").textContent = correct;
-    document.getElementById("pTodayAccuracy").textContent = attempted ? `${Math.round(correct / attempted * 100)}%` : "0%";
-    document.getElementById("pTotalAttempted").textContent = data.summary.attempted || 0;
-    document.getElementById("topicProgressList").innerHTML = topics.map((topic, i) => {
-      const p = data.topics[i] || {};
-      const a = p.attempted || 0, c = p.correct || 0, rate = a ? Math.round(c / a * 100) : 0;
-      return `<a class="topic-progress-card" href="${topic.href}"><div><span>${topic.title}</span><strong>${c} đúng / ${a} câu</strong></div><div class="topic-rate">${rate}%</div></a>`;
-    }).join("");
-  } catch (error) {
-    document.getElementById("topicProgressList").innerHTML = `<p class="data-error">Chưa tải được dữ liệu: ${error.message}</p>`;
+const session = await requireLogin("./login.html");
+if (!session) throw new Error("Chưa đăng nhập.");
+mountAccount(document.getElementById("accountArea"), session, {
+  loginHref: "./login.html",
+  progressHref: "./tien-do.html"
+});
+document.getElementById("studentName").textContent = displayName(session);
+
+try {
+  const data = await loadTopic("lop8-chude1", 7);
+  const todayRate = percent(data.today.correct, data.today.attempted);
+  const allRate = percent(data.summary.correct, data.summary.attempted);
+  const topicRate = percent(data.topic.correct, data.topic.attempted);
+  document.getElementById("todayAttempted").textContent = data.today.attempted || 0;
+  document.getElementById("todayCorrect").textContent = data.today.correct || 0;
+  document.getElementById("todayRate").textContent = `${todayRate}%`;
+  document.getElementById("allAttempted").textContent = data.summary.attempted || 0;
+  document.getElementById("allAttemptedDetail").textContent = data.summary.attempted || 0;
+  document.getElementById("allCorrect").textContent = data.summary.correct || 0;
+  document.getElementById("allRate").textContent = `${allRate}%`;
+  document.getElementById("topicAttempted").textContent = `${data.topic.attempted || 0} câu`;
+  document.getElementById("topicRate").textContent = `${topicRate}%`;
+  document.getElementById("topicBar").style.width = `${topicRate}%`;
+  document.getElementById("topicStatus").textContent = masteryLabel(data.topic.correct, data.topic.attempted);
+
+  const names = [
+    "Thu gọn hạng tử đồng dạng", "Bỏ ngoặc và đổi dấu", "Phân phối phép nhân",
+    "Thu gọn nhiều bước", "Nhân hai đa thức", "Hằng đẳng thức", "Biến đổi tổng hợp"
+  ];
+  const levelList = document.getElementById("levelProgress");
+  let recommendation = null;
+  data.levels.forEach((level, index) => {
+    const rate = percent(level.correct, level.attempted);
+    const row = document.createElement("div");
+    row.className = "level-row";
+    row.innerHTML = `
+      <div class="level-row-head"><strong>Mức ${index + 1}: ${names[index]}</strong><span>${level.attempted || 0} câu · ${rate}%</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${rate}%"></div></div>`;
+    levelList.appendChild(row);
+    if (!recommendation && level.attempted >= 3 && rate < 70) recommendation = { index, rate, name: names[index] };
+  });
+
+  const recommendationText = document.getElementById("recommendationText");
+  if (recommendation) {
+    recommendationText.textContent = `Nên luyện lại Mức ${recommendation.index + 1}: ${recommendation.name}. Tỉ lệ hiện tại là ${recommendation.rate}%.`;
+  } else if ((data.topic.attempted || 0) === 0) {
+    recommendationText.textContent = "Hãy bắt đầu từ Mức 1 và làm khoảng 10 câu trước khi đánh giá mức độ thành thạo.";
+  } else {
+    recommendationText.textContent = "Chưa có mức nào dưới ngưỡng 70% sau ít nhất 3 câu. Bạn có thể tiếp tục mức đang học.";
   }
+} catch (error) {
+  document.getElementById("progressError").textContent = `Không tải được tiến độ: ${error.message}`;
 }

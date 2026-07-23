@@ -1,5 +1,5 @@
-import { requireAccess, renderAccount } from "../../assets/auth-service.js";
-import { saveAttempt, loadTopicDashboard, localDateKey } from "../../assets/progress-service.js";
+import { requireAccess, mountAccount } from "../../core/auth.js";
+import { saveAttempt, loadTopic, localDateKey } from "../../core/progress.js";
 
 const session = await requireAccess({
   loginPath: "../../login.html",
@@ -9,7 +9,7 @@ const session = await requireAccess({
 });
 
 if (!session) throw new Error("Không có quyền truy cập.");
-renderAccount(session, document.getElementById("accountBox"));
+mountAccount(document.getElementById("accountBox"), session, { loginHref: "../../login.html", progressHref: "../../tien-do.html" });
 
 const levels = [
   {
@@ -251,7 +251,7 @@ function escapeHtml(text) {
 
 async function recordCloudProgress(isCorrect) {
   try {
-    await saveAttempt({ grade: 8, topicId: "lop8-chude1", level: currentLevel + 1, isCorrect });
+    await saveAttempt({ grade: 8, topicId: "lop8-chude1", level: currentLevel + 1, skillId: `level-${currentLevel + 1}`, isCorrect });
     await renderStoredProgress();
   } catch (error) {
     feedback.className = "feedback incorrect";
@@ -266,7 +266,7 @@ async function renderStoredProgress() {
   }).format(new Date(`${key}T00:00:00`));
 
   try {
-    const { today, summary } = await loadTopicDashboard("lop8-chude1");
+    const { today, summary } = await loadTopic("lop8-chude1", 7);
     const answered = today.attempted || 0;
     const correct = today.correct || 0;
     const accuracy = answered ? Math.round(correct / answered * 100) : 0;
