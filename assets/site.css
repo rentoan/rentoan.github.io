@@ -111,3 +111,12 @@ h1 { font-size: clamp(2.35rem, 5vw, 4.5rem); line-height: 1.02; letter-spacing: 
   .login-page { display: block; }
   .login-panel { min-height: 100vh; }
 }
+
+.notice-banner {
+  padding: 14px 0;
+  background: #fff7d6;
+  border-bottom: 1px solid #f0d97a;
+  color: #674f00;
+}
+.notice-banner[hidden] { display: none; }
+[aria-disabled="true"] { pointer-events: none; opacity: .72; }

@@ -4,5 +4,7 @@
   "role": "student",
   "active": true,
   "allowedGrades": [8],
-  "allowedTopics": ["lop8-chude1"]
+  "allowedTopics": ["lop8-chude1"],
+  "parentEmail": "phuhuynh@example.com",
+  "emailReportEnabled": true
 }

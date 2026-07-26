@@ -1,17 +1,50 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
+    function signedIn() { return request.auth != null; }
+    function owner(userId) { return signedIn() && request.auth.uid == userId; }
+    function currentProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
-    function owner(userId) {
-      return signedIn() && request.auth.uid == userId;
+    function teacher() {
+      return signedIn() && currentProfile().role == 'teacher' && currentProfile().active == true;
+    }
+    function validInitialProfile() {
+      return request.resource.data.keys().hasOnly([
+          'username', 'displayName', 'role', 'active',
+          'allowedGrades', 'allowedTopics', 'parentEmail',
+          'emailReportEnabled', 'createdAt'
+        ])
+        && request.resource.data.username is string
+        && request.resource.data.displayName == request.resource.data.username
+        && request.resource.data.role == 'student'
+        && request.resource.data.active == true
+        && request.resource.data.allowedGrades is list
+        && request.resource.data.allowedGrades.size() == 0
+        && request.resource.data.allowedTopics is list
+        && request.resource.data.allowedTopics.size() == 0
+        && request.resource.data.parentEmail == ''
+        && request.resource.data.emailReportEnabled == false
+        && request.resource.data.createdAt == request.time;
+    }
+    function validTeacherUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName', 'active', 'allowedGrades', 'allowedTopics',
+          'parentEmail', 'emailReportEnabled', 'updatedAt'
+        ])
+        && request.resource.data.username == resource.data.username
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.displayName is string
+        && request.resource.data.active is bool
+        && request.resource.data.allowedGrades is list
+        && request.resource.data.allowedTopics is list
+        && request.resource.data.parentEmail is string
+        && request.resource.data.emailReportEnabled is bool;
     }
     function validCounters(data) {
-      return data.attempted is int
-        && data.correct is int
-        && data.attempted >= 0
-        && data.correct >= 0
+      return data.attempted is int && data.correct is int
+        && data.attempted >= 0 && data.correct >= 0
         && data.correct <= data.attempted;
     }
     function validCreate() {
@@ -27,15 +60,21 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if owner(userId);
-      allow create, update, delete: if false;
+      allow read: if owner(userId) || teacher();
+      allow create: if owner(userId) && validInitialProfile();
+      allow update: if teacher() && validTeacherUpdate();
+      allow delete: if false;
 
       match /progress/{progressId} {
-        allow read: if owner(userId);
+        allow read: if owner(userId) || teacher();
         allow create: if owner(userId) && validCreate();
         allow update: if owner(userId) && validUpdate();
         allow delete: if false;
       }
+    }
+
+    match /emailReports/{reportId} {
+      allow read, write: if false;
     }
   }
 }

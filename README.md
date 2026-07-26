@@ -1,100 +1,181 @@
-# RenToan v1.0
+# RenToan v1.3
 
-Website luyện Toán tĩnh chạy trên GitHub Pages, sử dụng Firebase Authentication để đăng nhập và Cloud Firestore để lưu tiến độ.
+> Bản này giữ nguyên v1.1, bổ sung Chủ đề 2 và trang quản trị học sinh. Xem `README-V1.3.md` để cập nhật.
 
-## Chức năng Giai đoạn 1
+# RenToan v1.1
+
+Website luyện Toán theo chủ đề, chạy giao diện trên GitHub Pages và dùng Firebase cho đăng nhập, tiến độ và email báo cáo phụ huynh.
+
+## Những gì đã có trong v1.1
 
 - Đăng nhập bằng tên người dùng và mật khẩu do giáo viên cấp.
-- Phân quyền theo lớp (`allowedGrades`) và chủ đề (`allowedTopics`).
-- Toán 8, Chủ đề 1: Biến đổi biểu thức đại số, gồm 7 mức luyện.
-- Ghi số câu đã làm, số câu đúng theo ngày, chủ đề và mức luyện.
-- Trang tiến độ cá nhân và gợi ý mức cần luyện lại.
-- Không có chức năng tự đăng ký tài khoản.
+- Tự tạo hồ sơ Firestore ở lần đăng nhập đầu tiên nếu tài khoản mới chỉ tồn tại trong Authentication.
+- Tài khoản mới ở trạng thái chờ cấp quyền, không còn báo lỗi “chưa có hồ sơ học tập”.
+- Phân quyền theo lớp và theo chủ đề.
+- Lưu số câu đã làm, số câu đúng theo ngày, chủ đề và mức luyện.
+- Trang tiến độ cá nhân và gợi ý mức cần luyện thêm.
+- Cloud Function gửi email phụ huynh lúc 21:00 hằng ngày, múi giờ Việt Nam.
+- Email vẫn được gửi khi học sinh không làm câu nào trong ngày.
+- Chống gửi lặp bằng collection `emailReports`.
 
-## 1. Đưa website lên GitHub Pages
+## Cấu trúc chính
 
-Tải toàn bộ nội dung thư mục này vào thư mục gốc repository `rentoan.github.io`:
-
+```text
+rentoan-v1.1/
+├── index.html
+├── login.html
+├── tien-do.html
+├── assets/
+├── core/
+├── lop-8/
+├── firestore/
+├── functions/               # Cloud Function gửi email
+├── firebase.json
+├── .firebaserc
+└── .nojekyll
 ```
+
+## 1. Cập nhật GitHub Pages
+
+Tải toàn bộ nội dung bên trong thư mục này lên thư mục gốc của repository `rentoan.github.io`.
+
+Các file quan trọng phải nằm ngay ngoài cùng:
+
+```text
 index.html
 login.html
-tien-do.html
-khong-co-quyen.html
-.nojekyll
 assets/
 core/
-firestore/
 lop-8/
 ```
 
-Trong GitHub: `Settings → Pages → Deploy from a branch → main → /(root)`.
+Thư mục `functions/` không chạy trên GitHub Pages. Nó được giữ cùng repository để quản lý mã nguồn, nhưng phải triển khai riêng lên Firebase.
 
-## 2. Bật Authentication
+## 2. Cập nhật Firestore Rules
 
-Trong Firebase Console:
+Mở file:
 
-1. `Security → Authentication`.
-2. `Sign-in method`.
-3. Bật `Email/Password`.
-4. Trong `Settings → Authorized domains`, thêm `rentoan.github.io`.
+```text
+firestore/firestore.rules
+```
 
-## 3. Tạo Firestore và cài Rules
+Sao chép toàn bộ vào Firebase Console:
 
-1. Tạo Firestore Database.
-2. Mở tab `Rules`.
-3. Sao chép toàn bộ nội dung `firestore/firestore.rules`.
-4. Bấm `Publish`.
+```text
+Firestore → Rules → Publish
+```
 
-Rules cho phép người học đọc hồ sơ của chính mình và chỉ tăng bộ đếm tiến độ mỗi lần một câu. Người học không thể tự sửa hồ sơ quyền truy cập.
+Rules mới cho phép một tài khoản đã đăng nhập tự tạo duy nhất hồ sơ ban đầu của chính mình với quyền rỗng. Người học không thể tự sửa quyền, email phụ huynh hoặc trạng thái tài khoản.
 
-## 4. Tạo tài khoản bằng tay
+## 3. Luồng tạo tài khoản mới
 
-Trong `Authentication → Users → Add user`:
+Trong Firebase Authentication, tạo:
 
-- Email kỹ thuật: `user01@rentoan.local`
-- Password: mật khẩu bạn cấp
+```text
+user01@rentoan.local
+```
 
-Người học chỉ nhập `user01` ở màn hình đăng nhập. Website tự nối phần `@rentoan.local`.
+Khi `user01` đăng nhập lần đầu, website tự tạo:
 
-Sau khi tạo, sao chép UID của người dùng.
+```text
+users/{UID}
+```
 
-## 5. Tạo hồ sơ quyền trong Firestore
+với dữ liệu ban đầu:
 
-Tạo collection `users`, sau đó tạo document có Document ID đúng bằng UID của tài khoản Authentication.
+```json
+{
+  "username": "user01",
+  "displayName": "user01",
+  "role": "student",
+  "active": true,
+  "allowedGrades": [],
+  "allowedTopics": [],
+  "parentEmail": "",
+  "emailReportEnabled": false
+}
+```
 
-Thêm các trường:
+Sau đó giáo viên sửa hồ sơ trong Firestore Console:
 
-| Field | Type | Ví dụ |
-|---|---|---|
-| username | string | user01 |
-| displayName | string | Nguyễn Minh An |
-| role | string | student |
-| active | boolean | true |
-| allowedGrades | array | 8 (number) |
-| allowedTopics | array | lop8-chude1 (string) |
+```text
+displayName: Nguyễn Minh An
+allowedGrades: [8]
+allowedTopics: ["lop8-chude1"]
+parentEmail: email-phu-huynh@example.com
+emailReportEnabled: true
+```
 
-Mẫu nằm trong `firestore/user-profile-example.json`.
+Lưu ý:
 
-### Quy tắc cấp quyền
+- `8` trong `allowedGrades` là Number.
+- `lop8-chude1` là String.
+- Không để khoảng trắng thừa ở email phụ huynh.
+- Đặt `emailReportEnabled = false` nếu tạm ngừng gửi báo cáo.
 
-- `allowedGrades: [8]`: được vào Toán 8.
-- `allowedTopics: ["lop8-chude1"]`: chỉ được vào Chủ đề 1.
-- `allowedTopics: []`: được vào tất cả chủ đề đang mở của lớp đã cấp.
-- `active: false`: khóa tài khoản.
+## 4. Dữ liệu email hằng ngày
 
-## 6. Kiểm tra
+Function đọc:
 
-1. Mở `https://rentoan.github.io/login.html`.
-2. Đăng nhập bằng `user01` và mật khẩu đã tạo.
-3. Làm một câu.
-4. Mở Firestore: `users/{UID}/progress` để thấy các document:
-   - `summary`
-   - `day-YYYY-MM-DD`
-   - `lop8-chude1`
-   - `lop8-chude1-level-1` ...
+```text
+users/{UID}
+users/{UID}/progress/day-YYYY-MM-DD
+```
 
-## Lưu ý
+Sau khi gửi thành công, Function ghi:
 
-- Cấu hình Firebase phía web không phải private key. Bảo vệ dữ liệu nằm ở Authentication và Firestore Rules.
-- Giai đoạn 1 chưa có trang quản trị. Tài khoản và quyền được quản lý trực tiếp trong Firebase Console.
-- Không xóa hoặc cho phép học sinh sửa document `users/{UID}`.
+```text
+emailReports/YYYY-MM-DD_UID
+```
+
+Nhờ đó một báo cáo không bị gửi lặp khi Cloud Scheduler thử chạy lại.
+
+## 5. Triển khai Cloud Function
+
+Xem hướng dẫn chi tiết tại:
+
+```text
+HUONG-DAN-GUI-EMAIL.md
+```
+
+Các điều kiện cần có:
+
+- Firebase project nâng lên Blaze plan.
+- Firebase CLI trên máy hoặc Google Cloud Shell.
+- Một tài khoản SMTP, chẳng hạn Gmail App Password, Brevo, SendGrid hoặc nhà cung cấp SMTP khác.
+- Secret `SMTP_CONFIG` đã được thiết lập.
+
+## 6. Giờ gửi báo cáo
+
+Function được đặt lịch:
+
+```text
+21:00 mỗi ngày
+Múi giờ: Asia/Ho_Chi_Minh
+```
+
+Muốn đổi giờ, sửa trong `functions/index.js`:
+
+```js
+schedule: "0 21 * * *"
+```
+
+Ví dụ 20:30:
+
+```js
+schedule: "30 20 * * *"
+```
+
+## 7. Nội dung email
+
+Email gồm:
+
+- số câu đã làm trong ngày;
+- số câu đúng;
+- tỉ lệ chính xác;
+- chủ đề gần nhất;
+- mức luyện gần nhất;
+- nhận xét tự động;
+- đường dẫn tới RenToan.
+
+Ngày không học vẫn gửi thông báo: “Hôm nay chưa ghi nhận hoạt động luyện tập.”

@@ -31,14 +31,19 @@ export async function saveAttempt({ grade, topicId, level, skillId, isCorrect })
     correct: increment(isCorrect ? 1 : 0),
     updatedAt: serverTimestamp()
   };
+  const activity = {
+    lastTopicId: topicId,
+    lastLevel: level,
+    lastSkillId: skillId || ""
+  };
   const batch = writeBatch(db);
   const base = ["users", user.uid, "progress"];
 
   batch.set(doc(db, ...base, "summary"), {
-    type: "summary", ...shared, lastActiveDate: date
+    type: "summary", ...shared, ...activity, lastActiveDate: date
   }, { merge: true });
   batch.set(doc(db, ...base, `day-${date}`), {
-    type: "daily", date, ...shared
+    type: "daily", date, ...shared, ...activity
   }, { merge: true });
   batch.set(doc(db, ...base, topicId), {
     type: "topic", grade, topicId, currentLevel: level, ...shared
