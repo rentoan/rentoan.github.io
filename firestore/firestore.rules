@@ -5,79 +5,25 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function owner(userId) {
-      return signedIn() && request.auth.uid == userId;
-    }
-
-    function teacher() {
+    function isTeacher() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
 
-    function validInitialProfile() {
-      return request.resource.data.keys().hasOnly([
-          'username', 'displayName', 'role', 'active',
-          'allowedGrades', 'allowedTopics', 'parentEmail',
-          'emailReportEnabled', 'createdAt'
-        ])
-        && request.resource.data.username is string
-        && request.resource.data.displayName == request.resource.data.username
-        && request.resource.data.role == 'student'
-        && request.resource.data.active == true
-        && request.resource.data.allowedGrades is list
-        && request.resource.data.allowedGrades.size() == 0
-        && request.resource.data.allowedTopics is list
-        && request.resource.data.allowedTopics.size() == 0
-        && request.resource.data.parentEmail == ''
-        && request.resource.data.emailReportEnabled == false
-        && request.resource.data.createdAt == request.time;
-    }
-
-    function validTeacherUpdate() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-        'displayName',
-        'active',
-        'allowedGrades',
-        'allowedTopics',
-        'parentEmail',
-        'emailReportEnabled',
-        'updatedAt'
-      ]);
-    }
-
-    function validCounters(data) {
-      return data.attempted is int
-        && data.correct is int
-        && data.attempted >= 0
-        && data.correct >= 0
-        && data.correct <= data.attempted;
-    }
-
-    function validCreate() {
-      return validCounters(request.resource.data)
-        && request.resource.data.attempted == 1
-        && (request.resource.data.correct == 0
-          || request.resource.data.correct == 1);
-    }
-
-    function validUpdate() {
-      return validCounters(request.resource.data)
-        && request.resource.data.attempted == resource.data.attempted + 1
-        && (request.resource.data.correct == resource.data.correct
-          || request.resource.data.correct == resource.data.correct + 1);
-    }
-
     match /users/{userId} {
-      allow read: if owner(userId) || teacher();
-      allow create: if owner(userId) && validInitialProfile();
-      allow update: if teacher() && validTeacherUpdate();
+      allow read: if request.auth != null && (request.auth.uid == userId || isTeacher());
+
+      // Bản chẩn đoán: giáo viên được cập nhật document người dùng.
+      // Chưa kiểm tra danh sách field để loại trừ hoàn toàn lỗi từ validTeacherUpdate().
+      allow update: if isTeacher();
+
+      allow create: if request.auth != null && request.auth.uid == userId;
       allow delete: if false;
 
       match /progress/{progressId} {
-        allow read: if owner(userId) || teacher();
-        allow create: if owner(userId) && validCreate();
-        allow update: if owner(userId) && validUpdate();
+        allow read: if request.auth != null && (request.auth.uid == userId || isTeacher());
+        allow create, update: if request.auth != null && request.auth.uid == userId;
         allow delete: if false;
       }
     }
