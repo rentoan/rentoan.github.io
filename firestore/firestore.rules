@@ -1,14 +1,20 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function owner(userId) { return signedIn() && request.auth.uid == userId; }
-    function currentProfile() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function owner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
     function teacher() {
-      return signedIn() && currentProfile().role == 'teacher' && currentProfile().active == true;
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
+
     function validInitialProfile() {
       return request.resource.data.keys().hasOnly([
           'username', 'displayName', 'role', 'active',
@@ -27,28 +33,34 @@ service cloud.firestore {
         && request.resource.data.emailReportEnabled == false
         && request.resource.data.createdAt == request.time;
     }
+
     function validTeacherUpdate() {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName', 'active', 'allowedGrades', 'allowedTopics',
-          'parentEmail', 'emailReportEnabled', 'updatedAt'
-        ])
-        && request.resource.data.displayName is string
-        && request.resource.data.active is bool
-        && request.resource.data.allowedGrades is list
-        && request.resource.data.allowedTopics is list
-        && request.resource.data.parentEmail is string
-        && request.resource.data.emailReportEnabled is bool;
+        'displayName',
+        'active',
+        'allowedGrades',
+        'allowedTopics',
+        'parentEmail',
+        'emailReportEnabled',
+        'updatedAt'
+      ]);
     }
+
     function validCounters(data) {
-      return data.attempted is int && data.correct is int
-        && data.attempted >= 0 && data.correct >= 0
+      return data.attempted is int
+        && data.correct is int
+        && data.attempted >= 0
+        && data.correct >= 0
         && data.correct <= data.attempted;
     }
+
     function validCreate() {
       return validCounters(request.resource.data)
         && request.resource.data.attempted == 1
-        && (request.resource.data.correct == 0 || request.resource.data.correct == 1);
+        && (request.resource.data.correct == 0
+          || request.resource.data.correct == 1);
     }
+
     function validUpdate() {
       return validCounters(request.resource.data)
         && request.resource.data.attempted == resource.data.attempted + 1
