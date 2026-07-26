@@ -32,9 +32,6 @@ service cloud.firestore {
           'displayName', 'active', 'allowedGrades', 'allowedTopics',
           'parentEmail', 'emailReportEnabled', 'updatedAt'
         ])
-        && request.resource.data.username == resource.data.username
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.displayName is string
         && request.resource.data.active is bool
         && request.resource.data.allowedGrades is list
