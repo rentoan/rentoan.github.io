@@ -5,25 +5,41 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
     function isTeacher() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
 
+    function teacherChangedOnlyAllowedFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'displayName',
+        'active',
+        'allowedGrades',
+        'allowedTopics',
+        'parentEmail',
+        'emailReportEnabled',
+        'updatedAt'
+      ]);
+    }
+
     match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isTeacher());
+      allow read: if isOwner(userId) || isTeacher();
 
-      // Bản chẩn đoán: giáo viên được cập nhật document người dùng.
-      // Chưa kiểm tra danh sách field để loại trừ hoàn toàn lỗi từ validTeacherUpdate().
-      allow update: if isTeacher();
+      allow create: if isOwner(userId)
+        && request.resource.data.role == 'student'
+        && request.resource.data.active == true;
 
-      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if isTeacher() && teacherChangedOnlyAllowedFields();
       allow delete: if false;
 
       match /progress/{progressId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isTeacher());
-        allow create, update: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId) || isTeacher();
+        allow create, update: if isOwner(userId);
         allow delete: if false;
       }
     }
