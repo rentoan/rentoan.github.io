@@ -12,27 +12,32 @@ mountAccount(document.getElementById("accountArea"), session, {
   progressHref: "../tien-do.html"
 });
 
-const topicId = "lop8-chude1";
-const allowed = hasTopic(session.profile, topicId, 8);
-const card = document.querySelector(`[data-topic="${topicId}"]`);
-if (!allowed) card.classList.add("locked");
+const topics = [
+  { id: "lop8-chude1", href: "./chu-de-1/index.html" },
+  { id: "lop8-chude2", href: "./chu-de-2/index.html" }
+];
 
-try {
-  const { topics } = await loadDashboard([topicId]);
-  const topic = topics[0] || {};
-  const rate = percent(topic.correct, topic.attempted);
+const dashboard = await loadDashboard(topics.map(topic => topic.id)).catch(() => ({ topics: [] }));
+
+topics.forEach((topic, index) => {
+  const card = document.querySelector(`[data-topic="${topic.id}"]`);
+  if (!card) return;
+
+  const allowed = hasTopic(session.profile, topic.id, 8);
+  if (!allowed) card.classList.add("locked");
+
+  const data = dashboard.topics[index] || {};
+  const rate = percent(data.correct, data.attempted);
   card.querySelector("[data-topic-rate]").textContent = `${rate}%`;
-  card.querySelector("[data-topic-attempted]").textContent = `${topic.attempted || 0} câu`;
-  card.querySelector("[data-topic-status]").textContent = masteryLabel(topic.correct, topic.attempted);
+  card.querySelector("[data-topic-attempted]").textContent = `${data.attempted || 0} câu`;
+  card.querySelector("[data-topic-status]").textContent = masteryLabel(data.correct, data.attempted);
   card.querySelector(".progress-fill").style.width = `${rate}%`;
-} catch (error) {
-  card.querySelector("[data-topic-status]").textContent = "Chưa tải được tiến độ";
-}
 
-const action = card.querySelector("[data-topic-action]");
-if (allowed) {
-  action.outerHTML = '<a class="button button-primary" href="./chu-de-1/index.html">Bắt đầu luyện</a>';
-} else {
-  action.textContent = "Chưa được cấp quyền";
-  action.disabled = true;
-}
+  const action = card.querySelector("[data-topic-action]");
+  if (allowed) {
+    action.outerHTML = `<a class="button button-primary" href="${topic.href}">Bắt đầu luyện</a>`;
+  } else {
+    action.textContent = "Chưa được cấp quyền";
+    action.disabled = true;
+  }
+});
