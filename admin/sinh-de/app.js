@@ -4,9 +4,10 @@ import { mountPreview } from './engine/preview.js';
 import { downloadAnswerPdf, downloadBothPdfs, downloadExamPdf } from './engine/pdfEngine.js';
 import * as topic1 from './generators/chu-de-1.js';
 import * as topic2 from './generators/chu-de-2.js';
+import * as topic3 from './generators/chu-de-3.js';
 
 const engine = new QuestionEngine();
-engine.register(topic1).register(topic2);
+engine.register(topic1).register(topic2).register(topic3);
 
 const state = { exam: null, previewMode: 'exam' };
 const $ = (selector) => document.querySelector(selector);
