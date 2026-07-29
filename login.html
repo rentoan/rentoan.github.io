@@ -1,7 +1,50 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng nhập | RenToan</title><link rel="stylesheet" href="./assets/site.css"></head>
-<body><main class="login-page">
-<section class="login-art"><div class="brand"><span class="brand-mark">R</span> RenToan</div><div><span class="eyebrow" style="color:#e9e2ff">Luyện tập theo chủ đề</span><h1>Mỗi ngày một chút, kiến thức dần thành phản xạ.</h1><p>Làm bài, nhận phản hồi ngay và theo dõi tiến độ của riêng bạn trên mọi thiết bị.</p></div><p>RenToan v1.1 · Báo cáo phụ huynh</p></section>
-<section class="login-panel"><div class="login-box"><div class="brand" style="margin-bottom:38px"><span class="brand-mark">R</span> RenToan</div><h2>Chào mừng trở lại</h2><p>Nhập tài khoản do giáo viên cấp để tiếp tục luyện tập.</p>
-<form id="loginForm"><div class="field"><label for="username">Tên đăng nhập</label><input id="username" autocomplete="username" placeholder="Ví dụ: user01" required></div><div class="field"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password" required></div><div id="formMessage" class="form-message" role="alert"></div><button id="submitButton" class="button button-primary full" type="submit">Đăng nhập</button></form>
-<div class="note" style="margin-top:22px">Tài khoản được tạo thủ công. Kết quả học tập được lưu theo từng người dùng bằng Firebase Authentication và Firestore.</div></div></section>
-</main><script type="module" src="./assets/login-page.js"></script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Đăng nhập | RenToan</title>
+  <link rel="stylesheet" href="./assets/site.css">
+</head>
+<body>
+  <main class="login-page">
+    <section class="login-art">
+      <div class="brand"><span class="brand-mark">R</span> RenToan</div>
+
+      <div>
+        <span class="eyebrow" style="color:#e9e2ff">Luyện tập theo chủ đề</span>
+        <h1 id="dailyQuote">Mỗi bước luyện tập hôm nay đang âm thầm xây nền cho ngày mai.</h1>
+        <p id="dailyQuoteNote">Một lời nhắc nhỏ cho hành trình học tập mỗi ngày.</p>
+      </div>
+
+      <p>RenToan · Luyện tập đều đặn, tiến bộ bền vững</p>
+    </section>
+
+    <section class="login-panel">
+      <div class="login-box">
+        <div class="brand" style="margin-bottom:38px"><span class="brand-mark">R</span> RenToan</div>
+        <h2>Chào mừng trở lại</h2>
+        <p>Nhập tài khoản do giáo viên cấp để tiếp tục luyện tập.</p>
+
+        <form id="loginForm">
+          <div class="field">
+            <label for="username">Tên đăng nhập</label>
+            <input id="username" autocomplete="username" placeholder="Ví dụ: user01" required>
+          </div>
+          <div class="field">
+            <label for="password">Mật khẩu</label>
+            <input id="password" type="password" autocomplete="current-password" required>
+          </div>
+          <div id="formMessage" class="form-message" role="alert"></div>
+          <button id="submitButton" class="button button-primary full" type="submit">Đăng nhập</button>
+        </form>
+
+        <div class="note" style="margin-top:22px">Tài khoản được tạo thủ công. Kết quả học tập được lưu theo từng người dùng bằng Firebase Authentication và Firestore.</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/daily-quotes.js"></script>
+  <script type="module" src="./assets/login-page.js"></script>
+</body>
+</html>
