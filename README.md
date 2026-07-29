@@ -1,39 +1,24 @@
-# RenToan - Lớp 8 - Chương 4
+# RenToan lớp 8 · Đồng bộ Chương 3, 4, 5
 
-Gói nội dung độc lập cho:
+Gói cập nhật này được tổ chức đúng theo thư mục gốc của website. Giải nén rồi chép đè các thư mục `lop-8`, `assets` và `admin` lên repository GitHub Pages.
 
-- **Chương 4: Định lí Thalès**
-- Đường dẫn sau khi đưa lên GitHub Pages: `/lop-8/chu-de-4/`
+## Nội dung cập nhật
+
+- Hoàn thiện trang luyện tập Chương 3: Tứ giác.
+- Hoàn thiện trang luyện tập Chương 4: Định lí Thalès.
+- Bổ sung trang luyện tập Chương 5: Dữ liệu và biểu đồ.
+- Chuyển nút **Bài mới** xuống cạnh **Nộp bài** ở cả ba chương.
+- Cập nhật trang `/lop-8/` để hiển thị Chương 1 đến Chương 5.
+- Cập nhật `assets/grade8.js` để kiểm tra quyền và tiến độ của Chương 1 đến Chương 5.
+- Cập nhật trang Admin để cấp quyền riêng cho Chương 1 đến Chương 5.
+- Cập nhật `/admin/sinh-de/` với generator Chương 3, 4, 5 và đăng ký đủ năm chương.
+- Giữ bản sửa chia trang PDF của gói v1.4.0 trước đó.
 
 ## Cách cập nhật
 
-Chép nguyên thư mục `lop-8/chu-de-4/` vào thư mục gốc của dự án RenToan.
+1. Giải nén ZIP.
+2. Chép đè ba thư mục `lop-8`, `assets`, `admin` vào thư mục gốc website.
+3. Commit và đẩy lên GitHub.
+4. Sau khi GitHub Pages cập nhật, nhấn `Ctrl + F5`.
 
-Gói này dùng lại các module chung đã có của dự án:
-
-- `/core/auth.js`
-- `/core/progress.js`
-- `/login.html`
-- `/khong-co-quyen.html`
-- `/tien-do.html`
-
-Không cần sửa Firebase hoặc Firestore Rules nếu Chủ đề 1, 2, 3 đang lưu tiến độ bình thường.
-
-## Bảy mức luyện
-
-1. Tỉ số các đoạn thẳng.
-2. Định lí Thalès trong tam giác.
-3. Định lí Thalès đảo.
-4. Đường trung bình của tam giác.
-5. Tính chất đường phân giác.
-6. Bài toán thực tế.
-7. Luyện tập tổng hợp.
-
-## Tệp chính
-
-- `index.html`: giao diện chương.
-- `config.js`: metadata và mô tả các mức.
-- `generator.js`: sinh bài tập.
-- `checker.js`: chấm số, phân số và đơn vị.
-- `app.js`: kết nối giao diện, đăng nhập và tiến độ.
-- `style.css`: giao diện đồng nhất với Chương 3.
+Không cần thay đổi Firestore Rules. Các ID tiến độ/quyền học mới là `lop8-chude3`, `lop8-chude4`, `lop8-chude5`.

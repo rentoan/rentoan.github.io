@@ -5,9 +5,11 @@ import { downloadAnswerPdf, downloadBothPdfs, downloadExamPdf } from './engine/p
 import * as topic1 from './generators/chu-de-1.js';
 import * as topic2 from './generators/chu-de-2.js';
 import * as topic3 from './generators/chu-de-3.js';
+import * as topic4 from './generators/chu-de-4.js';
+import * as topic5 from './generators/chu-de-5.js';
 
 const engine = new QuestionEngine();
-engine.register(topic1).register(topic2).register(topic3);
+engine.register(topic1).register(topic2).register(topic3).register(topic4).register(topic5);
 
 const state = { exam: null, previewMode: 'exam' };
 const $ = (selector) => document.querySelector(selector);
