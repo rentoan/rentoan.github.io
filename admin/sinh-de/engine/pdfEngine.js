@@ -11,6 +11,65 @@ function requirePdfLibraries() {
 
 async function waitForPaint() {
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (document.fonts?.ready) await document.fonts.ready;
+}
+
+/**
+ * Lấy vị trí các khối không nên bị cắt đôi khi chia trang PDF.
+ * Tọa độ được đổi từ CSS pixel sang pixel thực của canvas html2canvas.
+ */
+function collectKeepTogetherRanges(paper, canvas) {
+  const paperRect = paper.getBoundingClientRect();
+  const scaleY = canvas.height / paperRect.height;
+  const selectors = [
+    '.paper-header',
+    '.question-block',
+    '.answer-block',
+    '.paper-footer'
+  ].join(',');
+
+  return [...paper.querySelectorAll(selectors)]
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        top: Math.max(0, Math.round((rect.top - paperRect.top) * scaleY)),
+        bottom: Math.min(canvas.height, Math.ceil((rect.bottom - paperRect.top) * scaleY))
+      };
+    })
+    .filter((range) => range.bottom > range.top)
+    .sort((a, b) => a.top - b.top);
+}
+
+/**
+ * Chọn điểm cắt trang gần với chiều cao A4 nhưng lùi lên trước một câu hỏi/
+ * lời giải nếu điểm cắt dự kiến đang đi xuyên qua khối đó.
+ */
+function choosePageEnd(offsetY, desiredEnd, maxSliceHeight, ranges, canvasHeight) {
+  let pageEnd = Math.min(desiredEnd, canvasHeight);
+
+  const crossedRange = ranges.find((range) => (
+    range.top > offsetY + 4 &&
+    range.top < pageEnd &&
+    range.bottom > pageEnd
+  ));
+
+  if (crossedRange) {
+    const blockHeight = crossedRange.bottom - crossedRange.top;
+    const contentBeforeBlock = crossedRange.top - offsetY;
+
+    // Chỉ lùi điểm cắt khi khối có thể nằm trọn trên một trang và trang hiện
+    // tại không bị rỗng. Khối quá cao vẫn phải được cắt theo chiều cao A4.
+    if (blockHeight <= maxSliceHeight && contentBeforeBlock >= 80) {
+      pageEnd = crossedRange.top;
+    }
+  }
+
+  // Chốt an toàn để vòng lặp luôn tiến về phía trước.
+  if (pageEnd <= offsetY + 4) {
+    pageEnd = Math.min(offsetY + maxSliceHeight, canvasHeight);
+  }
+
+  return pageEnd;
 }
 
 async function htmlToPdf(html, filename) {
@@ -23,12 +82,16 @@ async function htmlToPdf(html, filename) {
 
   try {
     const paper = staging.querySelector('.paper');
+    if (!paper) throw new Error('Không tìm thấy nội dung đề để xuất PDF.');
+
     const canvas = await html2canvas(paper, {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: 794
+      windowWidth: 794,
+      scrollX: 0,
+      scrollY: 0
     });
 
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
@@ -36,24 +99,52 @@ async function htmlToPdf(html, filename) {
     const pageHeight = 297;
     const margin = 8;
     const usableWidth = pageWidth - margin * 2;
+    const usableHeight = pageHeight - margin * 2;
     const pxPerMm = canvas.width / usableWidth;
-    const pageSlicePx = Math.floor((pageHeight - margin * 2) * pxPerMm);
+    const maxSliceHeight = Math.floor(usableHeight * pxPerMm);
+    const keepTogetherRanges = collectKeepTogetherRanges(paper, canvas);
 
     let offsetY = 0;
     let page = 0;
+
     while (offsetY < canvas.height) {
-      const sliceHeight = Math.min(pageSlicePx, canvas.height - offsetY);
+      const desiredEnd = Math.min(offsetY + maxSliceHeight, canvas.height);
+      const pageEnd = choosePageEnd(
+        offsetY,
+        desiredEnd,
+        maxSliceHeight,
+        keepTogetherRanges,
+        canvas.height
+      );
+      const sliceHeight = pageEnd - offsetY;
+
       const slice = document.createElement('canvas');
       slice.width = canvas.width;
       slice.height = sliceHeight;
-      slice.getContext('2d').drawImage(canvas, 0, offsetY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+      const context = slice.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, slice.width, slice.height);
+      context.drawImage(
+        canvas,
+        0,
+        offsetY,
+        canvas.width,
+        sliceHeight,
+        0,
+        0,
+        canvas.width,
+        sliceHeight
+      );
+
       const imgData = slice.toDataURL('image/jpeg', 0.94);
       const imageHeightMm = sliceHeight / pxPerMm;
       if (page > 0) pdf.addPage();
       pdf.addImage(imgData, 'JPEG', margin, margin, usableWidth, imageHeightMm, undefined, 'FAST');
+
       page += 1;
-      offsetY += sliceHeight;
+      offsetY = pageEnd;
     }
+
     pdf.save(filename);
   } finally {
     staging.remove();
