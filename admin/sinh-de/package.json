@@ -1,0 +1,9 @@
+{
+  "name": "rentoan-v1.4-goi-1-engine",
+  "version": "1.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-engine.mjs"
+  }
+}

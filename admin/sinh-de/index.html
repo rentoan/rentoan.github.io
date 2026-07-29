@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RenToan · Sinh đề luyện tập</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>RenToan · Sinh đề luyện tập</h1>
+    <a href="../">← Quay lại quản trị</a>
+  </header>
+
+  <main class="layout">
+    <aside class="panel controls">
+      <h2>Cấu hình đề</h2>
+      <div class="form-grid">
+        <div class="field"><label for="examNumber">Số đề</label><input id="examNumber" value="1"></div>
+        <div class="field"><label for="duration">Thời gian (phút)</label><input id="duration" type="number" min="5" value="45"></div>
+        <div class="field full"><label for="schoolName">Tên trường/đơn vị (không bắt buộc)</label><input id="schoolName" placeholder="Để trống sẽ hiện RENTOAN"></div>
+        <div class="field full"><label for="teacherName">Giáo viên (không bắt buộc)</label><input id="teacherName"></div>
+        <div class="field full"><label for="seed">Mã tái tạo đề</label><input id="seed" placeholder="Để trống để sinh mã mới"></div>
+      </div>
+      <p class="hint">Giữ nguyên mã tái tạo và cấu hình để sinh lại đúng đề.</p>
+
+      <h2>Ma trận số câu</h2>
+      <div id="matrixBody"></div>
+
+      <div class="actions">
+        <button class="btn primary" id="generateBtn">Sinh đề</button>
+        <button class="btn" id="regenerateBtn">Sinh đề mới</button>
+        <button class="btn" id="resetBtn">Xóa cấu hình</button>
+        <button class="btn" id="downloadBothBtn" data-requires-exam disabled>Tải cả hai PDF</button>
+      </div>
+      <div id="status" class="status" role="status"></div>
+      <p class="note">PDF được dựng ngay trên trình duyệt. Lần đầu mở trang cần Internet để tải hai thư viện xuất PDF từ CDN.</p>
+    </aside>
+
+    <section class="panel preview-panel">
+      <div class="preview-toolbar">
+        <div><h2>Xem trước</h2><span id="summary">Chưa có đề.</span></div>
+        <div class="toolbar-actions">
+          <button class="btn active" data-preview-mode="exam" data-requires-exam disabled>Đề bài</button>
+          <button class="btn" data-preview-mode="answer" data-requires-exam disabled>Đáp án</button>
+          <button class="btn" id="downloadExamBtn" data-requires-exam disabled>Tải đề PDF</button>
+          <button class="btn" id="downloadAnswerBtn" data-requires-exam disabled>Tải đáp án PDF</button>
+        </div>
+      </div>
+      <div id="preview" class="preview-wrap"><div class="empty-preview">Nhập số câu rồi bấm <strong>Sinh đề</strong>.</div></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
