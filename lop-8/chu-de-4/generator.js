@@ -249,14 +249,17 @@ function level5() {
       );
     },
     () => {
-      const ratio = rand(2, 5), db = rand(2, 7) * ratio, dc = rand(2, 7);
-      const ab = db, ac = dc;
+      // Chọn các độ dài theo cùng một tỉ lệ và bảo đảm tạo được tam giác không suy biến.
+      const p = rand(2, 6), q = rand(2, 6);
+      const t = rand(1, 4), s = t + rand(1, 4);
+      const db = p * t, dc = q * t;
+      const ab = p * s, ac = q * s;
       return choiceQ(
         "AD là phân giác góc A. Chọn cặp độ dài AB, AC phù hợp:",
         `DB = ${db} cm, DC = ${dc} cm`,
         `AB = ${ab} cm, AC = ${ac} cm`,
         [`AB = ${ac} cm, AC = ${ab} cm`, `AB = ${ab + 1} cm, AC = ${ac} cm`, `AB = ${ab} cm, AC = ${ac + 1} cm`],
-        `Cần có AB/AC = DB/DC = ${db}/${dc}; cặp ${ab}/${ac} thỏa mãn.`
+        `Theo tính chất đường phân giác, AB/AC = DB/DC = ${p}/${q}. Cặp ${ab}/${ac} thỏa mãn tỉ lệ này và AB + AC > DB + DC nên tam giác không suy biến.`
       );
     },
     () => {
