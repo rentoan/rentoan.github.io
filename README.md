@@ -1,24 +1,13 @@
-# RenToan lớp 8 · Đồng bộ Chương 3, 4, 5
+# Bản cập nhật giao diện câu hỏi RenToan
 
-Gói cập nhật này được tổ chức đúng theo thư mục gốc của website. Giải nén rồi chép đè các thư mục `lop-8`, `assets` và `admin` lên repository GitHub Pages.
+Chép đè thư mục `lop-8/` vào thư mục gốc của repository.
 
-## Nội dung cập nhật
+Các thay đổi áp dụng cho Chương 3, 4 và 5:
 
-- Hoàn thiện trang luyện tập Chương 3: Tứ giác.
-- Hoàn thiện trang luyện tập Chương 4: Định lí Thalès.
-- Bổ sung trang luyện tập Chương 5: Dữ liệu và biểu đồ.
-- Chuyển nút **Bài mới** xuống cạnh **Nộp bài** ở cả ba chương.
-- Cập nhật trang `/lop-8/` để hiển thị Chương 1 đến Chương 5.
-- Cập nhật `assets/grade8.js` để kiểm tra quyền và tiến độ của Chương 1 đến Chương 5.
-- Cập nhật trang Admin để cấp quyền riêng cho Chương 1 đến Chương 5.
-- Cập nhật `/admin/sinh-de/` với generator Chương 3, 4, 5 và đăng ký đủ năm chương.
-- Giữ bản sửa chia trang PDF của gói v1.4.0 trước đó.
+- Biểu thức và nội dung đề dùng Be Vietnam Pro, đồng bộ với theme chung.
+- Giảm cỡ chữ và tăng khả năng tự xuống dòng để câu dài dễ đọc hơn.
+- Phương án trả lời dùng cùng font giao diện, độ đậm 500.
+- Phần giải thích được đặt trong hộp xanh nhạt có biểu tượng gợi ý.
+- Bổ sung MathJax để sẵn sàng hiển thị phân số, số mũ, căn thức và công thức LaTeX ở các chương tiếp theo.
 
-## Cách cập nhật
-
-1. Giải nén ZIP.
-2. Chép đè ba thư mục `lop-8`, `assets`, `admin` vào thư mục gốc website.
-3. Commit và đẩy lên GitHub.
-4. Sau khi GitHub Pages cập nhật, nhấn `Ctrl + F5`.
-
-Không cần thay đổi Firestore Rules. Các ID tiến độ/quyền học mới là `lop8-chude3`, `lop8-chude4`, `lop8-chude5`.
+Sau khi cập nhật GitHub Pages, nhấn Ctrl + F5 để tải lại CSS và JavaScript mới.

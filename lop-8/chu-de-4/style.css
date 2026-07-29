@@ -99,8 +99,21 @@ button:active { transform: translateY(1px); }
 .primary-button { background: var(--accent); color: white; border-color: var(--accent); font-weight: 700; }
 .instruction { color: var(--muted); margin-top: 46px; }
 .expression {
-  margin: 14px 0 28px; padding: 26px; border-radius: 18px; background: var(--surface-2);
-  text-align: center; font-family: Georgia, serif; font-size: clamp(1.8rem, 6vw, 3rem); letter-spacing: .02em;
+  margin: 14px 0 28px;
+  padding: clamp(20px, 3vw, 28px);
+  min-height: 112px;
+  border-radius: 18px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  font-size: clamp(1.45rem, 4.2vw, 2.45rem);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 .answer-area { display: grid; gap: 12px; }
 .answer-input {
@@ -108,6 +121,8 @@ button:active { transform: translateY(1px); }
 }
 .answer-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .choice {
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  font-weight: 500;
   display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
 }
 .choice:hover { background: var(--surface-2); }
@@ -116,7 +131,27 @@ button:active { transform: translateY(1px); }
 .feedback { margin-top: 24px; padding: 17px 18px; border-radius: 15px; }
 .feedback.correct { background: var(--success-bg); color: var(--success); }
 .feedback.incorrect { background: var(--danger-bg); color: var(--danger); }
-.feedback strong { display: block; margin-bottom: 4px; }
+.feedback strong { display: block; margin-bottom: 8px; }
+.feedback-explanation {
+  display: block;
+  margin-top: 10px;
+  padding: 13px 15px 13px 42px;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--accent-soft) 72%, var(--surface));
+  color: var(--text);
+  position: relative;
+  line-height: 1.65;
+}
+.feedback-explanation::before {
+  content: "💡";
+  position: absolute;
+  left: 14px;
+  top: 11px;
+  font-size: 1rem;
+}
+.mjx-container { color: inherit; }
+.expression .MathJax { font-size: 1em !important; }
 .hidden { display: none; }
 
 .tips-card { margin: 24px 0 64px; padding: 24px 28px; }
